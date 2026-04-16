@@ -122,7 +122,6 @@ let
         };
 
         fsType = mkOption {
-          default = "auto";
           example = "ext3";
           type = nonEmptyStr;
           description = ''
@@ -284,7 +283,6 @@ let
       ++ lib.optionals (!config.boot.initrd.checkJournalingFS) [
         "ext3"
         "ext4"
-        "reiserfs"
         "xfs"
         "jfs"
         "f2fs"

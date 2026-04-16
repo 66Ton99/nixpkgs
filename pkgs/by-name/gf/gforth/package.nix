@@ -17,13 +17,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "gforth";
-  version = "0.7.9_20251001";
+  version = "0.7.9_20260410";
 
   src = fetchFromGitHub {
     owner = "forthy42";
     repo = "gforth";
     rev = finalAttrs.version;
-    hash = "sha256-u9snXcFa/YYvITgMBY8FRYyyLFhHCP6hWA5ljwdKGLk=";
+    hash = "sha256-Nb5CB2k7gfG3sT+zfHGmj9G/CGccIvSIKcOuP7Altn0=";
   };
 
   patches = [ ./use-nproc-instead-of-fhs.patch ];
@@ -65,5 +65,6 @@ stdenv.mkDerivation (finalAttrs: {
     broken = stdenv.hostPlatform.isDarwin;
     platforms = lib.platforms.all;
     mainProgram = "gforth";
+    maintainers = with lib.maintainers; [ rafaelrc ];
   };
 })

@@ -1,6 +1,6 @@
 {
   rustPlatform,
-  pnpm_9,
+  pnpm_10,
   fetchPnpmDeps,
   pnpmConfigHook,
   cargo-tauri,
@@ -21,35 +21,34 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "readest";
-  version = "0.9.96";
+  version = "0.9.100";
 
   src = fetchFromGitHub {
     owner = "readest";
     repo = "readest";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-3PCdcSF9ocDqHzK9P/FJQwch5u5zVLQ3eDNSGJQGSKw=";
+    hash = "sha256-GsIOMfNqjcdtVRZ0XwCkxpQoIonivLJVT4GmZyB86M0=";
     fetchSubmodules = true;
   };
 
   postUnpack = ''
-    # pnpm.configHook has to write to ../.., as our sourceRoot is set to apps/readest-app
+    # pnpm.configHook has to write to ../.., as our sourceRoot is set to
+    # apps/readest-app
     chmod -R +w .
   '';
 
   sourceRoot = "${finalAttrs.src.name}/apps/readest-app";
 
+  pnpmRoot = "../..";
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
-    pnpm = pnpm_9;
-    fetcherVersion = 1;
-    hash = "sha256-Ea/J3W3L8vVDlIRY/szaCfcqunjiFU6yL+e8h4c5UHg=";
+    pnpm = pnpm_10;
+    fetcherVersion = 3;
+    hash = "sha256-/bzjOdpvuPLBMvX/q1WaO3lFg5/jLz5Ypr5OojssXUI=";
   };
 
-  pnpmRoot = "../..";
-
-  cargoHash = "sha256-AwrA0KXLTSUhLxIJHKU1crVxUxImFOKDRStB48mZfcg=";
-
   cargoRoot = "../..";
+  cargoHash = "sha256-qYBHYjwfGkKmGXN8caamZ6/XGtnxe+lmy6dIpdMwS/I=";
 
   buildAndTestSubdir = "src-tauri";
 
@@ -67,7 +66,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     cargo-tauri.hook
     nodejs
     pnpmConfigHook
-    pnpm_9
+    pnpm_10
     pkg-config
     wrapGAppsHook3
     autoPatchelfHook
@@ -92,12 +91,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
     pnpm setup-vendors
   '';
 
-  preFixup = ''
-    gappsWrapperArgs+=(
-      --set-default WEBKIT_DISABLE_DMABUF_RENDERER 1
-    )
-  '';
-
   passthru.updateScript = nix-update-script { };
 
   meta = {
@@ -106,7 +99,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     changelog = "https://github.com/readest/readest/releases/tag/v${finalAttrs.version}";
     mainProgram = "readest";
     license = lib.licenses.agpl3Plus;
-    maintainers = with lib.maintainers; [ eljamm ];
+    maintainers = with lib.maintainers; [
+      eljamm
+      kasifrasi
+    ];
     platforms = lib.platforms.linux;
   };
 })

@@ -13,15 +13,15 @@
   nix-update-script,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "oidc-agent";
-  version = "5.3.3";
+  version = "5.3.5";
 
   src = fetchFromGitHub {
     owner = "indigo-dc";
     repo = "oidc-agent";
-    rev = "v${version}";
-    hash = "sha256-PV1aswfvEMtsgHWKfdtIo/BV+MHKKdul2vjFdyoT2Ic=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-BGslxBQWXS65wNs6HEbH7yqxt0+3isAiP51wrGhqKLk=";
   };
 
   nativeBuildInputs = [
@@ -68,4 +68,4 @@ stdenv.mkDerivation rec {
     maintainers = with lib.maintainers; [ xinyangli ];
     license = lib.licenses.mit;
   };
-}
+})

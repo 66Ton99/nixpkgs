@@ -1,24 +1,24 @@
 {
   lib,
-  buildGoModule,
+  buildGo125Module,
   fetchFromGitHub,
 }:
 
-buildGoModule rec {
+buildGo125Module (finalAttrs: {
   pname = "tidb";
-  version = "8.5.4";
+  version = "8.5.5";
 
   src = fetchFromGitHub {
     owner = "pingcap";
     repo = "tidb";
-    rev = "v${version}";
-    sha256 = "sha256-8YlN49XPplEAk1RwqB+2fXyTMIAFXt5W0CGOE0hc3PQ=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-wrCdclS9qpc0mq5QZ6u5/APZyOTWvCJNCPCzM385MBM=";
   };
 
-  vendorHash = "sha256-fVY34aZCaxGh6OXV9oEkdEtJpXqyaQjxH0v6Xfpokz4=";
+  vendorHash = "sha256-7g8U0gbG46AC4h1SyOTKKuNc5eVRqJsimzshj4O5FYw=";
 
   ldflags = [
-    "-X github.com/pingcap/tidb/pkg/parser/mysql.TiDBReleaseVersion=${version}"
+    "-X github.com/pingcap/tidb/pkg/parser/mysql.TiDBReleaseVersion=${finalAttrs.version}"
     "-X github.com/pingcap/tidb/pkg/util/versioninfo.TiDBEdition=Community"
   ];
 
@@ -31,4 +31,4 @@ buildGoModule rec {
     maintainers = with lib.maintainers; [ Makuru ];
     mainProgram = "tidb-server";
   };
-}
+})

@@ -6,20 +6,20 @@
   nix-update-script,
 }:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "filebeat";
-  version = "8.19.9";
+  version = "8.19.14";
 
   src = fetchFromGitHub {
     owner = "elastic";
     repo = "beats";
-    tag = "v${version}";
-    hash = "sha256-ysxy4kMUvIYDoWjDF9gwXByAwdCh0Taw3JFCxh9j/Gk=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-rNXT8GVL5M/Hx0XA3oksbW1w+tt9FhobZlg2tCQxroc=";
   };
 
   proxyVendor = true; # darwin/linux hash mismatch
 
-  vendorHash = "sha256-WvJwFmnT7m4757yMKhuj3RS/NuzkoH9zlda94OpoYNg=";
+  vendorHash = "sha256-4jLLZxnjV8QnHh/FtBWD0OcvcdqEMSJxFeRjURZPAVo=";
 
   subPackages = [ "filebeat" ];
 
@@ -37,9 +37,9 @@ buildGoModule rec {
   meta = {
     description = "Tails and ships log files";
     homepage = "https://github.com/elastic/beats";
-    changelog = "https://www.elastic.co/guide/en/beats/libbeat/${version}/release-notes-${version}.html";
+    changelog = "https://www.elastic.co/guide/en/beats/libbeat/${finalAttrs.version}/release-notes-${finalAttrs.version}.html";
     license = lib.licenses.asl20;
     maintainers = with lib.maintainers; [ srhb ];
     mainProgram = "filebeat";
   };
-}
+})

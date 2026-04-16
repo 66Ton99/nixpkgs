@@ -21,9 +21,13 @@
   python3,
   qt6Packages,
   woff2,
+  cargo,
   fast-float,
   ffmpeg,
+  fmt,
   fontconfig,
+  rustPlatform,
+  rustc,
   simdutf,
   skia,
   nixosTests,
@@ -31,17 +35,23 @@
   libtommath,
   sdl3,
   icu78,
+  simdjson,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "ladybird";
-  version = "0-unstable-2025-12-24";
+  version = "0-unstable-2026-04-04";
 
   src = fetchFromGitHub {
     owner = "LadybirdBrowser";
     repo = "ladybird";
-    rev = "5b4341996b2d22e549f0bc6f749b188e5014847f";
-    hash = "sha256-EVP8OoFqOySAhy02nQpc4CKYCV/rPW87pjMxb/IdBxM=";
+    rev = "b11f30b32eff7c5e7baf6e84d0a432975631486d";
+    hash = "sha256-Fv74py0dQG2hQti40eh7vXCkN0rkheeqQ/JM3KIuLDA=";
+  };
+
+  cargoDeps = rustPlatform.fetchCargoVendor {
+    inherit (finalAttrs) src;
+    hash = "sha256-5CB5mRdmvsmTmy3PGKhCx3NZm7Et2cIwIg9vF2wA7xE=";
   };
 
   postPatch = ''
@@ -72,10 +82,13 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   nativeBuildInputs = [
+    cargo
     cmake
     ninja
     pkg-config
     python3
+    rustPlatform.cargoSetupHook
+    rustc
     qt6Packages.wrapQtAppsHook
     libtommath
   ];
@@ -84,6 +97,7 @@ stdenv.mkDerivation (finalAttrs: {
     curlFull
     fast-float
     ffmpeg
+    fmt
     fontconfig
     libavif
     angle # libEGL
@@ -113,6 +127,7 @@ stdenv.mkDerivation (finalAttrs: {
     }))
     woff2
     icu78
+    simdjson
   ]
   ++ lib.optional stdenv.hostPlatform.isLinux [
     libpulseaudio.dev

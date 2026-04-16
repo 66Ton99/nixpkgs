@@ -6,6 +6,10 @@
 }:
 {
   options.services.logind = {
+    enable = lib.mkEnableOption "the `systemd-logind` login service" // {
+      default = config.systemd.package.withLogind;
+      defaultText = lib.literalExpression "config.systemd.package.withLogind";
+    };
     settings.Login = lib.mkOption {
       description = ''
         Settings option for systemd-logind.
@@ -40,7 +44,7 @@
     };
   };
 
-  config = {
+  config = lib.mkIf config.services.logind.enable {
     systemd.additionalUpstreamSystemUnits = [
       "systemd-logind.service"
       "autovt@.service"
@@ -51,9 +55,6 @@
     ]
     ++ lib.optionals config.systemd.package.withMachined [
       "dbus-org.freedesktop.machine1.service"
-    ]
-    ++ lib.optionals config.systemd.package.withPortabled [
-      "dbus-org.freedesktop.portable1.service"
     ]
     ++ [
       "dbus-org.freedesktop.login1.service"

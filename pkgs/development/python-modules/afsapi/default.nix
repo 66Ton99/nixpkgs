@@ -6,22 +6,19 @@
   lxml,
   pytest-aiohttp,
   pytestCheckHook,
-  pythonOlder,
   setuptools-scm,
 }:
 
 buildPythonPackage rec {
   pname = "afsapi";
-  version = "0.2.8";
+  version = "0.3.1";
   format = "setuptools";
-
-  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "wlcrs";
     repo = "python-afsapi";
     tag = version;
-    hash = "sha256-eE5BsXNtSU6YUhRn4/SKpMrqaYf8tyfLKdxxGOmNJ9I=";
+    hash = "sha256-WkkRsXRJ4i3lUn3X94YX7ZqfaKE2GgrBycbflnnlC74=";
   };
 
   nativeBuildInputs = [ setuptools-scm ];

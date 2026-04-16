@@ -14,15 +14,15 @@
   zstd,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "nvc";
-  version = "1.18.2";
+  version = "1.20.0";
 
   src = fetchFromGitHub {
     owner = "nickg";
     repo = "nvc";
-    tag = "r${version}";
-    hash = "sha256-a1enY86rlLwlRSmY0R4ZfXUo6PddlIAeaKnvfJVcYCQ=";
+    tag = "r${finalAttrs.version}";
+    hash = "sha256-DtJyGzrs6G1eZ9xFgBp/2PLlzMiRp/ePTINv0lLZauw=";
   };
 
   nativeBuildInputs = [
@@ -65,4 +65,4 @@ stdenv.mkDerivation rec {
     maintainers = with lib.maintainers; [ wegank ];
     platforms = lib.platforms.unix;
   };
-}
+})

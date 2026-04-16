@@ -8,13 +8,13 @@
 
 postgresqlBuildExtension (finalAttrs: {
   pname = "pg_background";
-  version = "1.5";
+  version = "1.9.2";
 
   src = fetchFromGitHub {
     owner = "vibhorkum";
     repo = "pg_background";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-9fW5wHdo9r5fLwU8zN2EEVSWxa+7q2qMjPpMo6iCavg=";
+    hash = "sha256-R78lB/58/dfZPg4XZ5xGuQ/Ftv+SQzU4aeJop6tslK8=";
   };
 
   buildInputs = postgresql.buildInputs;

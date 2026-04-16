@@ -18,13 +18,13 @@
 
 let
   pname = "gui-for-clash";
-  version = "1.16.0";
+  version = "1.21.1";
 
   src = fetchFromGitHub {
     owner = "GUI-for-Cores";
     repo = "GUI.for.Clash";
     tag = "v${version}";
-    hash = "sha256-eIKgXZ48iVkFSwTJ04j6CXyvgVsUCBRZ9hwdid/DwsE=";
+    hash = "sha256-eIJYtXa0JdP7hLvBRnWyh0KkdMWvOd2GRXPaqCvP8yE=";
   };
 
   metaCommon = {
@@ -53,8 +53,8 @@ let
         sourceRoot
         ;
       pnpm = pnpm_10;
-      fetcherVersion = 2;
-      hash = "sha256-oi78tk0ygR37jtWW3hZnDF44qxWjIFvUU4u5rNffvD8=";
+      fetcherVersion = 3;
+      hash = "sha256-gr6XIhLKWSOJ4LWiliOvMoA9QbPiohrCPmvObz49/pw=";
     };
 
     buildPhase = ''
@@ -84,7 +84,7 @@ buildGoModule {
 
   patches = [ ./xdg-path-and-restart-patch.patch ];
 
-  vendorHash = "sha256-ElDJknPzR7Zh46RjUsn39Msm1B8Nsp1eHIS3ifRl80w=";
+  vendorHash = "sha256-EeIxt0BzSaZh1F38btUXN9kAvj12nlqEerVgWVGkiuk=";
 
   nativeBuildInputs = [
     autoPatchelfHook

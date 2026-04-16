@@ -300,7 +300,7 @@ let
         idx:
         { size, ... }:
         ''
-          test -e "empty${builtins.toString idx}.qcow2" || ${qemu}/bin/qemu-img create -f qcow2 "empty${builtins.toString idx}.qcow2" "${builtins.toString size}M"
+          test -e "empty${toString idx}.qcow2" || ${qemu}/bin/qemu-img create -f qcow2 "empty${toString idx}.qcow2" "${toString size}M"
         ''
       ))
       (builtins.concatStringsSep "")
@@ -365,6 +365,7 @@ in
   imports = [
     ../profiles/qemu-guest.nix
     ./disk-size-option.nix
+    ./guest-networking-options.nix
     (mkRenamedOptionModule
       [
         "virtualisation"
@@ -437,7 +438,7 @@ in
     virtualisation.bootLoaderDevice = mkOption {
       type = types.path;
       default = "/dev/disk/by-id/virtio-${rootDriveSerialAttr}";
-      defaultText = literalExpression ''/dev/disk/by-id/virtio-${rootDriveSerialAttr}'';
+      defaultText = literalExpression "/dev/disk/by-id/virtio-${rootDriveSerialAttr}";
       example = "/dev/disk/by-id/virtio-boot-loader-device";
       description = ''
         The path (inside th VM) to the device to boot from when legacy booting.
@@ -469,7 +470,7 @@ in
     virtualisation.rootDevice = mkOption {
       type = types.nullOr types.path;
       default = "/dev/disk/by-label/${rootFilesystemLabel}";
-      defaultText = literalExpression ''/dev/disk/by-label/${rootFilesystemLabel}'';
+      defaultText = literalExpression "/dev/disk/by-label/${rootFilesystemLabel}";
       example = "/dev/disk/by-label/nixos";
       description = ''
         The path (inside the VM) to the device containing the root filesystem.
@@ -679,57 +680,6 @@ in
       '';
     };
 
-    virtualisation.vlans = mkOption {
-      type = types.listOf types.ints.unsigned;
-      default = if config.virtualisation.interfaces == { } then [ 1 ] else [ ];
-      defaultText = lib.literalExpression ''if config.virtualisation.interfaces == {} then [ 1 ] else [ ]'';
-      example = [
-        1
-        2
-      ];
-      description = ''
-        Virtual networks to which the VM is connected.  Each
-        number «N» in this list causes
-        the VM to have a virtual Ethernet interface attached to a
-        separate virtual network on which it will be assigned IP
-        address
-        `192.168.«N».«M»`,
-        where «M» is the index of this VM
-        in the list of VMs.
-      '';
-    };
-
-    virtualisation.interfaces = mkOption {
-      default = { };
-      example = {
-        enp1s0.vlan = 1;
-      };
-      description = ''
-        Network interfaces to add to the VM.
-      '';
-      type =
-        with types;
-        attrsOf (submodule {
-          options = {
-            vlan = mkOption {
-              type = types.ints.unsigned;
-              description = ''
-                VLAN to which the network interface is connected.
-              '';
-            };
-
-            assignIP = mkOption {
-              type = types.bool;
-              default = false;
-              description = ''
-                Automatically assign an IP address to the network interface using the same scheme as
-                virtualisation.vlans.
-              '';
-            };
-          };
-        });
-    };
-
     virtualisation.writableStore = mkOption {
       type = types.bool;
       default = cfg.mountHostNixStore;
@@ -750,20 +700,6 @@ in
         Use a tmpfs for the writable store instead of writing to the VM's
         own filesystem.
       '';
-    };
-
-    networking.primaryIPAddress = mkOption {
-      type = types.str;
-      default = "";
-      internal = true;
-      description = "Primary IP address used in /etc/hosts.";
-    };
-
-    networking.primaryIPv6Address = mkOption {
-      type = types.str;
-      default = "";
-      internal = true;
-      description = "Primary IPv6 address used in /etc/hosts.";
     };
 
     virtualisation.host.pkgs = mkOption {
@@ -1300,11 +1236,38 @@ in
     # allow `system.build.toplevel' to be included.  (If we had a direct
     # reference to ${regInfo} here, then we would get a cyclic
     # dependency.)
-    boot.postBootCommands = lib.mkIf config.nix.enable ''
-      if [[ "$(cat /proc/cmdline)" =~ regInfo=([^ ]*) ]]; then
-        ${config.nix.package.out}/bin/nix-store --load-db < ''${BASH_REMATCH[1]}
-      fi
-    '';
+    systemd.services.register-nix-paths = lib.mkIf config.nix.enable {
+      # Run early during boot so the nix store DB is populated before any
+      # service (or test backdoor) tries to use nix commands.
+      # nix-store --load-db writes to the SQLite DB directly, so it does not
+      # need the nix-daemon.
+      unitConfig.DefaultDependencies = false;
+      wantedBy = [
+        "sysinit.target"
+      ];
+      before = [
+        "sysinit.target"
+        "shutdown.target"
+        "nix-daemon.socket"
+        "nix-daemon.service"
+      ];
+      after = [
+        "local-fs.target"
+      ];
+      conflicts = [
+        "shutdown.target"
+      ];
+      restartIfChanged = false;
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      script = ''
+        if [[ "$(cat /proc/cmdline)" =~ regInfo=([^ ]*) ]]; then
+          ${lib.getExe' config.nix.package.out "nix-store"} --load-db < "''${BASH_REMATCH[1]}"
+        fi
+      '';
+    };
 
     boot.initrd.availableKernelModules =
       optional (cfg.qemu.diskInterface == "scsi") "sym53c8xx" ++ optional (cfg.tpm.enable) "tpm_tis";
@@ -1517,6 +1480,7 @@ in
             else
               {
                 device = "/nix/.ro-store";
+                fsType = "none";
                 options = [ "bind" ];
               }
           );

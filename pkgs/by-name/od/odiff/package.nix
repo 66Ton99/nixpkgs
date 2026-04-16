@@ -14,22 +14,22 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "odiff";
-  version = "4.3.2";
+  version = "4.3.3";
 
   src = fetchFromGitHub {
     owner = "dmtrKovalenko";
     repo = "odiff";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-gCF+CInczBJfDyZgxEQor5C/OSxKciCu9gbZanaE/nA=";
+    hash = "sha256-5x03mpqBllfEVBGMspcC/ljC6PrSXQgU2j+eKfHu6PM=";
   };
 
-  postPatch = ''
+  postConfigure = ''
     ln -s ${callPackage ./build.zig.zon.nix { }} $ZIG_GLOBAL_CACHE_DIR/p
   '';
 
   nativeBuildInputs = [
     installShellFiles
-    zig.hook
+    zig
     nasm
   ];
 
@@ -44,7 +44,7 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/dmtrKovalenko/odiff/releases";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ ddogfoodd ];
-    platforms = lib.platforms.linux;
+    platforms = (lib.platforms.linux ++ lib.platforms.darwin);
     mainProgram = "odiff";
   };
 })

@@ -9,7 +9,6 @@
   pycparser,
   pyqt5,
   pyqtwebengine,
-  pythonOlder,
   withGui ? false,
   wrapQtAppsHook,
   setuptools,
@@ -17,14 +16,12 @@
 
 buildPythonPackage rec {
   pname = "vivisect";
-  version = "1.2.1";
+  version = "1.3.2";
   pyproject = true;
-
-  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-zBWrVBub48rYBg7k9CDmgCWPpPz3R38/mtUCM1P3Mpk=";
+    hash = "sha256-UQryZ4aGVEr5vRLElmTwRNtgi3h6CPzzq5n+E58tuo8=";
   };
 
   pythonRelaxDeps = [

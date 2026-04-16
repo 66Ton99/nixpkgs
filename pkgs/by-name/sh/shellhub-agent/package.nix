@@ -10,25 +10,25 @@
   shellhub-agent,
 }:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "shellhub-agent";
-  version = "0.21.4";
+  version = "0.24.1";
 
   src = fetchFromGitHub {
     owner = "shellhub-io";
     repo = "shellhub";
-    rev = "v${version}";
-    hash = "sha256-Q53xxBclPH8oF+MS3gm99bOBhby7HQ+AqI6QeFTcmFc=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-3WzB7a8RJlsiKDSpuXgXenfa1q5XG5baI57qrFS0kw8=";
   };
 
   modRoot = "./agent";
 
-  vendorHash = "sha256-PiDciFxMevdWBww49+xTvZkYdyml5VmxoGG+E0PL658=";
+  vendorHash = "sha256-idfUmP2LFcnjmGpA/17phpYtGBiTC/cXjlDd/dkZ1i0=";
 
   ldflags = [
     "-s"
     "-w"
-    "-X main.AgentVersion=v${version}"
+    "-X main.AgentVersion=v${finalAttrs.version}"
   ];
 
   passthru = {
@@ -37,7 +37,7 @@ buildGoModule rec {
     tests.version = testers.testVersion {
       package = shellhub-agent;
       command = "agent --version";
-      version = "v${version}";
+      version = "v${finalAttrs.version}";
     };
   };
 
@@ -62,4 +62,4 @@ buildGoModule rec {
     platforms = lib.platforms.linux;
     mainProgram = "agent";
   };
-}
+})

@@ -7,18 +7,18 @@
   makeWrapper,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "snapraid";
-  version = "12.4";
+  version = "14.2";
 
   src = fetchFromGitHub {
     owner = "amadvance";
     repo = "snapraid";
-    rev = "v${version}";
-    hash = "sha256-7guTRH9AZCsQYyWLpws19/sEe9GVFop21GYPzXCK6Fg=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-IX1vvARLCJf/iK0TpE2d5cCdRWP2ou/n2gST/tp+fqs=";
   };
 
-  VERSION = version;
+  env.VERSION = finalAttrs.version;
 
   doCheck = true;
 
@@ -41,4 +41,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.unix;
     mainProgram = "snapraid";
   };
-}
+})

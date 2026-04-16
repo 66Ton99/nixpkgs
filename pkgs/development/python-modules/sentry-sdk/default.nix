@@ -62,19 +62,20 @@
   pytest-xdist,
   pytest-watch,
   responses,
+  socksio,
   stdenv,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "sentry-sdk";
-  version = "2.48.0";
+  version = "2.58.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "getsentry";
     repo = "sentry-python";
-    tag = version;
-    hash = "sha256-Y8zGs5xj0PB0zQMHmg9RwbCiarOC2s8k/5/yQr+sL4k=";
+    tag = finalAttrs.version;
+    hash = "sha256-SdGzHeniLwP8i7iIax5FtCd/qNDLLtg9luWbwpKIoz8=";
   };
 
   postPatch = ''
@@ -95,6 +96,7 @@ buildPythonPackage rec {
     anthropic = [ anthropic ];
     # TODO: arq
     asyncpg = [ asyncpg ];
+    asyncio = [ httpcore ] ++ httpcore.optional-dependencies.asyncio;
     beam = [ apache-beam ];
     bottle = [ bottle ];
     celery = [ celery ];
@@ -164,8 +166,10 @@ buildPythonPackage rec {
     pytest-xdist
     pytest-watch
     pytestCheckHook
+    socksio
   ]
-  ++ optional-dependencies.http2;
+  ++ finalAttrs.finalPackage.optional-dependencies.asyncio
+  ++ finalAttrs.finalPackage.optional-dependencies.http2;
 
   __darwinAllowLocalNetworking = true;
 
@@ -222,8 +226,8 @@ buildPythonPackage rec {
   meta = {
     description = "Official Python SDK for Sentry.io";
     homepage = "https://github.com/getsentry/sentry-python";
-    changelog = "https://github.com/getsentry/sentry-python/blob/${src.tag}/CHANGELOG.md";
+    changelog = "https://github.com/getsentry/sentry-python/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ hexa ];
   };
-}
+})

@@ -31,13 +31,13 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "modrinth-app-unwrapped";
-  version = "0.10.23";
+  version = "0.12.6";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Or2KkcZnZCZOnUd++SmDgbUOwa6ZmRDaoo7gF3XvN6I=";
+    hash = "sha256-qVFDCn+8dtiIULNIq37wIrqaUNvNIoXoHl8QhUTyz48=";
   };
 
   patches = [
@@ -67,7 +67,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --replace-fail '1.0.0-local' '${finalAttrs.version}'
   '';
 
-  cargoHash = "sha256-hWjoNwKA39YYhPSrQUNaM1nS+CtV9vff+aXpoQLPCOM=";
+  cargoHash = "sha256-PDsq5XEU+ZfyGzwtwxQ3i2TURjhies/Up3SVysOprZ0=";
   mitmCache = gradle.fetchDeps {
     inherit (finalAttrs) pname;
     data = ./deps.json;
@@ -76,8 +76,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     pnpm = pnpm_9;
-    fetcherVersion = 1;
-    hash = "sha256-jLuI8qNJgFkuBbKuBNKGuk/6v62iY7fNZX2t3U3olk0=";
+    fetcherVersion = 3;
+    hash = "sha256-JD+mzSHMVLGnkc5Jrxy+mtZ8W82E0pQhglsC3NmfszQ=";
   };
 
   nativeBuildInputs = [
@@ -160,7 +160,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
       gpl3Plus
       unfreeRedistributable
     ];
-    maintainers = with lib.maintainers; [ getchoo ];
+    maintainers = with lib.maintainers; [
+      getchoo
+      hythera
+      encode42
+    ];
     mainProgram = "ModrinthApp";
     platforms = with lib.platforms; linux ++ darwin;
     # This builds on architectures like aarch64, but the launcher itself does not support them yet.

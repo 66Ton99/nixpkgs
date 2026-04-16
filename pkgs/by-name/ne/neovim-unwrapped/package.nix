@@ -5,7 +5,8 @@
   cmake,
   gettext,
   libuv,
-  lua,
+  lua5_1,
+  luajit,
   pkg-config,
   unibilium,
   utf8proc,
@@ -18,6 +19,7 @@
   procps ? null,
   versionCheckHook,
   nix-update-script,
+  writableTmpDirAsHomeHook,
 
   # now defaults to false because some tests can be flaky (clipboard etc), see
   # also: https://github.com/neovim/neovim/issues/16233
@@ -25,6 +27,11 @@
   fish ? null,
   python3 ? null,
 }:
+
+let
+  lua = if lib.meta.availableOn stdenv.hostPlatform luajit then luajit else lua5_1;
+in
+
 stdenv.mkDerivation (
   finalAttrs:
   let
@@ -95,7 +102,7 @@ stdenv.mkDerivation (
   in
   {
     pname = "neovim-unwrapped";
-    version = "0.11.5";
+    version = "0.12.1";
 
     __structuredAttrs = true;
 
@@ -103,8 +110,10 @@ stdenv.mkDerivation (
       owner = "neovim";
       repo = "neovim";
       tag = "v${finalAttrs.version}";
-      hash = "sha256-OsvLB9kynCbQ8PDQ2VQ+L56iy7pZ0ZP69J2cEG8Ad8A=";
+      hash = "sha256-cbFM5TKGmhEDsdhMvGzMyn0Js0MJwdMwXDkzQcdw/TM=";
     };
+
+    strictDeps = true;
 
     patches = [
       # introduce a system-wide rplugin.vim in addition to the user one
@@ -115,18 +124,31 @@ stdenv.mkDerivation (
 
     inherit lua;
     treesitter-parsers =
-      treesitter-parsers
-      // {
-        markdown = treesitter-parsers.markdown // {
-          location = "tree-sitter-markdown";
-        };
-      }
-      // {
-        markdown_inline = treesitter-parsers.markdown // {
-          language = "markdown_inline";
-          location = "tree-sitter-markdown-inline";
-        };
-      };
+      lib.mapAttrs
+        (
+          language: grammar:
+          tree-sitter.buildGrammar {
+            inherit (grammar) src;
+            version = "neovim-${finalAttrs.version}";
+            language = grammar.language or language;
+            location = grammar.location or null;
+          }
+        )
+        (
+          treesitter-parsers
+
+          // {
+            markdown = treesitter-parsers.markdown // {
+              location = "tree-sitter-markdown";
+            };
+          }
+          // {
+            markdown_inline = treesitter-parsers.markdown // {
+              language = "markdown_inline";
+              location = "tree-sitter-markdown-inline";
+            };
+          }
+        );
 
     buildInputs = [
       libuv
@@ -140,18 +162,18 @@ stdenv.mkDerivation (
       unibilium
       utf8proc
     ]
-    ++ lib.optionals finalAttrs.finalPackage.doCheck [
-      glibcLocales
-      procps
+    ++ lib.optionals (stdenv.hostPlatform.libc != "glibc") [
+      # Provide libintl for non-glibc platforms
+      gettext
     ];
 
-    doCheck = false;
+    doCheck = true;
 
     # to be exhaustive, one could run
     # make oldtests too
     checkPhase = ''
       runHook preCheck
-      make functionaltest
+      make functionaltest__treesitter
       runHook postCheck
     '';
 
@@ -194,6 +216,7 @@ stdenv.mkDerivation (
       # third-party/CMakeLists.txt is not read at all.
       (lib.cmakeBool "USE_BUNDLED" false)
       (lib.cmakeBool "ENABLE_TRANSLATIONS" true)
+      (lib.cmakeBool "USE_BUNDLED_BUSTED" false)
     ]
     ++ (
       if lua.pkgs.isLuaJIT then
@@ -214,14 +237,7 @@ stdenv.mkDerivation (
     + lib.concatStrings (
       lib.mapAttrsToList (language: grammar: ''
         ln -s \
-          ${
-            tree-sitter.buildGrammar {
-              inherit (grammar) src;
-              version = "neovim-${finalAttrs.version}";
-              language = grammar.language or language;
-              location = grammar.location or null;
-            }
-          }/parser \
+          ${grammar}/parser \
           $out/lib/nvim/parser/${language}.so
       '') finalAttrs.treesitter-parsers
     );
@@ -234,6 +250,12 @@ stdenv.mkDerivation (
 
     nativeInstallCheckInputs = [
       versionCheckHook
+      lua.pkgs.busted
+      writableTmpDirAsHomeHook
+      glibcLocales
+
+      # needs git for vim.pack tests as well
+      procps
     ];
     versionCheckProgram = "${placeholder "out"}/bin/nvim";
     doInstallCheck = true;

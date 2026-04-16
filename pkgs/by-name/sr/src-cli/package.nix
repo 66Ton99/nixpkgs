@@ -3,23 +3,22 @@
   buildGoModule,
   fetchFromGitHub,
   stdenv,
-  xorg,
   testers,
   src-cli,
 }:
 
 buildGoModule rec {
   pname = "src-cli";
-  version = "6.11.0";
+  version = "7.0.3";
 
   src = fetchFromGitHub {
     owner = "sourcegraph";
     repo = "src-cli";
     rev = version;
-    hash = "sha256-uJAiNBrZmaDV7Etr3xAkDHXs7H9YZYLsyTcnaHGVJfI=";
+    hash = "sha256-B0ESsPbB4rWRLpOnU/ugVakUaduAGCs7n+XEDIYwUxs=";
   };
 
-  vendorHash = "sha256-H8xJtlAWkk7AcZBYR/xggs/Ut0cnHC49XiScEcdlkMc=";
+  vendorHash = "sha256-WB7lXLnWsQLLfzlAyFbEbfsaTY2wbRyqsQ0PdRF1/tk=";
 
   subPackages = [
     "cmd/src"

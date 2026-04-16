@@ -5,15 +5,15 @@
   nixosTests,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "3proxy";
-  version = "0.9.5";
+  version = "0.9.6";
 
   src = fetchFromGitHub {
     owner = "3proxy";
     repo = "3proxy";
-    tag = version;
-    sha256 = "sha256-uy6flZ1a7o02pr5O0pgl9zCjh8mE9W5JxotJeBMB16A=";
+    tag = finalAttrs.version;
+    sha256 = "sha256-0rCXz/vKFF5rvBXyvtt9DH0Jz+1i7rIylh07FqKBrZM=";
   };
 
   # They use 'install -s', that calls the native strip instead of the cross.
@@ -49,4 +49,4 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     maintainers = with lib.maintainers; [ misuzu ];
   };
-}
+})

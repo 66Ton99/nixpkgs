@@ -9,13 +9,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "highscore-bsnes";
-  version = "0-unstable-2025-12-23";
+  version = "0-unstable-2026-02-17";
 
   src = fetchFromGitHub {
     owner = "highscore-emu";
     repo = "bsnes";
-    rev = "df88234e314f97a2ca124df1982e4bd39f6fcea0";
-    hash = "sha256-QI9mRvcsPkVBhUZlhchgGVPROj7HAqgtHHnbHVzIIBI=";
+    rev = "db1f255622b3410485a54c7c0097c747e7144091";
+    hash = "sha256-SZugEb/vzFlzHjgHE/5ha03ULB95886N0b15iIlTsqA=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/bsnes";

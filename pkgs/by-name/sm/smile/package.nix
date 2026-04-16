@@ -13,16 +13,16 @@
   wl-clipboard,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+python3.pkgs.buildPythonApplication (finalAttrs: {
   pname = "smile";
-  version = "2.11.0";
+  version = "2.12.2";
   pyproject = false; # Builds with meson
 
   src = fetchFromGitHub {
     owner = "mijorus";
     repo = "smile";
-    tag = version;
-    hash = "sha256-uggbeFcafCvIpT+qHsnULTZ9oyQkfT7phI5KW00HEXg=";
+    tag = finalAttrs.version;
+    hash = "sha256-qAeAntJXitypbSu9dVvnMenXs9UwatcdIkdqmbjxFgk=";
   };
 
   nativeBuildInputs = [
@@ -70,4 +70,4 @@ python3.pkgs.buildPythonApplication rec {
       aleksana
     ];
   };
-}
+})

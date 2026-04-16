@@ -304,6 +304,11 @@ lib.mapAttrs mkLicense (
       redistributable = true;
     };
 
+    bzip2 = {
+      spdxId = "bzip2-1.0.6";
+      fullName = "bzip2 and libbzip2 License v1.0.6";
+    };
+
     cal10 = {
       spdxId = "CAL-1.0";
       fullName = "Cryptographic Autonomy License version 1.0 (CAL-1.0)";
@@ -742,6 +747,18 @@ lib.mapAttrs mkLicense (
       fullName = "Historical Permission Notice and Disclaimer - sell xserver variant with MIT disclaimer";
     };
 
+    hpndSellVariantSafetyClause = {
+      fullName = "HPND - sell variant with safety critical systems clause";
+      url = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-voodoo/-/blob/68a5b6d98ae34749cca889f4373b4043d00bfe6a/src/voodoo_dga.c#L12-33";
+      # TODO: if the license gets accepted to spdx then
+      #   add spdxId
+      # else
+      #   remove license
+      #   && replace reference with whatever this license is supposed to be then
+      # https://github.com/spdx/license-list-XML/issues/2922
+      # spdxId = "HPND-sell-variant-safety-clause";
+    };
+
     hpndDec = {
       fullName = "Historical Permission Notice and Disclaimer - DEC variant";
       spdxId = "HPND-DEC";
@@ -956,6 +973,11 @@ lib.mapAttrs mkLicense (
     libtiff = {
       spdxId = "libtiff";
       fullName = "libtiff License";
+    };
+
+    liliq-p-11 = {
+      spdxId = "LiLiQ-P-1.1";
+      fullName = "Licence Libre du Québec – Permissive version 1.1";
     };
 
     llgpl21 = {
@@ -1404,7 +1426,7 @@ lib.mapAttrs mkLicense (
 
     tsl = {
       shortName = "TSL";
-      fullName = "Timescale License Agreegment";
+      fullName = "Timescale License Agreement";
       url = "https://github.com/timescale/timescaledb/blob/main/tsl/LICENSE-TIMESCALE";
       free = false;
     };
@@ -1540,6 +1562,11 @@ lib.mapAttrs mkLicense (
     x11 = {
       spdxId = "X11";
       fullName = "X11 License";
+    };
+
+    x11BsdClause = {
+      fullName = "X11 License with third BSD clause";
+      url = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-geode/-/blob/d147c3f1b6907ae9db6f12853cedd450537d99d2/COPYING";
     };
 
     x11NoPermitPersons = {

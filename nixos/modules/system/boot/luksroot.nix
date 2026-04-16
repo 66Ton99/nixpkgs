@@ -602,7 +602,7 @@ let
             ++ optional (v.header != null) "header=${v.header}"
             ++ optional (v.keyFileOffset != null) "keyfile-offset=${toString v.keyFileOffset}"
             ++ optional (v.keyFileSize != null) "keyfile-size=${toString v.keyFileSize}"
-            ++ optional (v.keyFileTimeout != null) "keyfile-timeout=${builtins.toString v.keyFileTimeout}s"
+            ++ optional (v.keyFileTimeout != null) "keyfile-timeout=${toString v.keyFileTimeout}s"
             ++ optional (v.tryEmptyPassphrase) "try-empty-password=true";
         in
         "${n} ${v.device} ${if v.keyFile == null then "-" else v.keyFile} ${lib.concatStringsSep "," opts}"
@@ -635,7 +635,6 @@ in
       type = types.listOf types.str;
       default = [
         "aes"
-        "aes_generic"
         "blowfish"
         "twofish"
         "serpent"
@@ -999,7 +998,6 @@ in
                   type = with types; listOf singleLineStr;
                   default = [ ];
                   example = [ "_netdev" ];
-                  visible = false;
                   description = ''
                     Only used with systemd stage 1.
 

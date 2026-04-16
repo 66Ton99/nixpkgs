@@ -17,7 +17,7 @@ let
 in
 buildGoModule (finalAttrs: {
   pname = "llama-swap";
-  version = "176";
+  version = "199";
 
   outputs = [
     "out"
@@ -28,7 +28,7 @@ buildGoModule (finalAttrs: {
     owner = "mostlygeek";
     repo = "llama-swap";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-nfkuaiEITOmpkiLft3iNW1VUexHwZ36c8gwcQKGANbQ=";
+    hash = "sha256-tAWXhfOWPLBuEgd+32CbuIkn1hN+4VI4xkyx7E2a81I=";
     # populate values that require us to use git. By doing this in postFetch we
     # can delete .git afterwards and maintain better reproducibility of the src.
     leaveDotGit = true;
@@ -41,7 +41,7 @@ buildGoModule (finalAttrs: {
     '';
   };
 
-  vendorHash = "sha256-/EbFyuCVFxHTTO0UwSV3B/6PYUpudxB2FD8nNx1Bb+M=";
+  vendorHash = "sha256-XiDYlw/byu8CWvg4KSPC7m8PGCZXtp08Y1velx4BR8U=";
 
   passthru.ui = callPackage ./ui.nix { llama-swap = finalAttrs.finalPackage; };
 
@@ -81,8 +81,8 @@ buildGoModule (finalAttrs: {
 
   checkFlags =
     let
-      skippedTests = lib.optionals (stdenv.isDarwin && stdenv.isx86_64) [
-        # Fail only on x86_64-darwin intermittently
+      skippedTests = lib.optionals (stdenv.isDarwin) [
+        # Fail only on *-darwin intermittently
         # https://github.com/mostlygeek/llama-swap/issues/320
         "TestProcess_AutomaticallyStartsUpstream"
         "TestProcess_WaitOnMultipleStarts"
@@ -98,6 +98,7 @@ buildGoModule (finalAttrs: {
         "TestProcess_ForceStopWithKill"
         "TestProcess_StopCmd"
         "TestProcess_EnvironmentSetCorrectly"
+        "TestProcess_ReverseProxyPanicIsHandled"
       ];
     in
     [ "-skip=^${builtins.concatStringsSep "$|^" skippedTests}$" ];

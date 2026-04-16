@@ -3,7 +3,7 @@
   stdenv,
   fetchFromGitHub,
   ncurses,
-  libX11,
+  libx11,
   bzip2,
   zlib,
   brotli,
@@ -25,26 +25,26 @@
   python ? null,
   enablePerl ? (!stdenv.hostPlatform.isDarwin) && (stdenv.hostPlatform == stdenv.buildPlatform),
   perl ? null,
-# re-add javascript support when upstream supports modern spidermonkey
+  # re-add javascript support when upstream supports modern spidermonkey
 }:
 
 assert enableGuile -> guile != null;
 assert enablePython -> python != null;
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "elinks";
-  version = "0.18.0";
+  version = "0.19.1";
 
   src = fetchFromGitHub {
     owner = "rkd77";
     repo = "elinks";
-    rev = "v${version}";
-    hash = "sha256-TTb/v24gIWKiCQCESHo0Pz6rvRtw5anoXK0b35dzfLM=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-aQ+q2I6uTVv5kpKBaGJ1xiE/9vv9T7JI05VX/ROkAqA=";
   };
 
   buildInputs = [
     ncurses
-    libX11
+    libx11
     bzip2
     zlib
     brotli
@@ -96,4 +96,4 @@ stdenv.mkDerivation rec {
       iblech
     ];
   };
-}
+})

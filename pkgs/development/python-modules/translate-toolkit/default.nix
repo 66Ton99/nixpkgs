@@ -7,10 +7,12 @@
   setuptools-scm,
 
   # dependencies
+  lxml,
   unicode-segmentation-rs,
   urllib3,
+
+  # optional-dependencies
   tomlkit,
-  lxml,
 
   # tests
   aeidon,
@@ -28,25 +30,24 @@
   vobject,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "translate-toolkit";
-  version = "3.17.5";
-
+  version = "3.19.5";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "translate";
     repo = "translate";
-    tag = version;
-    hash = "sha256-I0HpVL/bH78oFGDWkXyRvZejXzjDHXFfdPu/+iMgAQw=";
+    tag = finalAttrs.version;
+    hash = "sha256-NJuhkJyXfGO2iwvcHUrfMZi55t1+89RN6jEIxHk8mcs=";
   };
 
   build-system = [ setuptools-scm ];
 
   dependencies = [
+    lxml
     unicode-segmentation-rs
     urllib3
-    lxml
   ];
 
   optional-dependencies = {
@@ -85,8 +86,8 @@ buildPythonPackage rec {
   meta = {
     description = "Useful localization tools for building localization & translation systems";
     homepage = "https://toolkit.translatehouse.org/";
-    changelog = "https://docs.translatehouse.org/projects/translate-toolkit/en/latest/releases/${src.tag}.html";
+    changelog = "https://docs.translatehouse.org/projects/translate-toolkit/en/latest/releases/${finalAttrs.src.tag}.html";
     license = lib.licenses.gpl2Plus;
     maintainers = with lib.maintainers; [ erictapen ];
   };
-}
+})

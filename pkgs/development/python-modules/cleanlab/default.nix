@@ -5,7 +5,6 @@
 
   # build-system
   setuptools,
-  setuptools-scm,
 
   # dependencies
   numpy,
@@ -33,19 +32,23 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "cleanlab";
-  version = "2.8.0";
+  version = "2.9.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "cleanlab";
     repo = "cleanlab";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-sgDQJy0iNxs3bIVuqV7LVEFC0jjlWvnqFzKr7ZDGmPo=";
+    hash = "sha256-0H4JTAc2tCtIFklGciXQ+TCWOiJ6kRkqcycJNeIpero=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail "setuptools>=65.0,<70.0" "setuptools"
+  '';
 
   build-system = [
     setuptools
-    setuptools-scm
   ];
 
   dependencies = [
@@ -79,11 +82,17 @@ buildPythonPackage (finalAttrs: {
     # Requires the datasets we prevent from downloading
     "test_create_imagelab"
 
+    # AssertionError: assert np.int64(36) == 35
+    "test_num_label_issues"
+
     # Non-trivial numpy2 incompatibilities
     # assert np.float64(0.492) == 0.491
     "test_duplicate_points_have_similar_scores"
     # AssertionError: assert 'Annotators [1] did not label any examples.'
     "test_label_quality_scores_multiannotator"
+    # AttributeError: module 'numpy' has no attribute 'in1d' (deprecated since numpy 2.x)
+    "test_bad_input_find_label_issues_internal"
+    "test_return_issues_ranked_by_scores"
   ]
   ++ lib.optionals (pythonAtLeast "3.12") [
     # AttributeError: 'called_once_with' is not a valid assertion.
@@ -107,9 +116,5 @@ buildPythonPackage (finalAttrs: {
     changelog = "https://github.com/cleanlab/cleanlab/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.agpl3Only;
     maintainers = with lib.maintainers; [ happysalada ];
-    # cleanlab is incompatible with datasets>=4.0.0
-    # cleanlab/datalab/internal/data.py:313: AssertionError
-    # https://github.com/cleanlab/cleanlab/issues/1244
-    broken = lib.versionAtLeast datasets.version "4.0.0";
   };
 })

@@ -12,13 +12,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "highscore-mupen64plus";
-  version = "0-unstable-2025-12-28";
+  version = "0-unstable-2026-04-10";
 
   src = fetchFromGitHub {
     owner = "highscore-emu";
     repo = "mupen64plus-highscore";
-    rev = "94ab5644e5363cf359b334ac057f3f36d24910be";
-    hash = "sha256-Q+6iL7DGr62C2fVEP0EWCgm7S7AYAW1C2X1GPKbI7aY=";
+    rev = "867c94907cd47f4843f3c8bddd371166c460ba8b";
+    hash = "sha256-hnDhyYcKkKh0mvksAOJOLYnyp5gNCk38dxMBT/1ItLQ=";
   };
 
   postPatch = ''

@@ -2,37 +2,36 @@
   lib,
   aiohttp,
   aresponses,
-  async-timeout,
   backoff,
   buildPythonPackage,
   fetchFromGitHub,
   hatchling,
-  mashumaro,
-  orjson,
   packaging,
+  pydantic,
   pytest-asyncio,
   pytest-cov-stub,
   pytest-mock,
   pytest-xdist,
   pytestCheckHook,
   yarl,
+  zeroconf,
 }:
 
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "python-bsblan";
-  version = "3.1.4";
+  version = "5.1.4";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "liudger";
     repo = "python-bsblan";
-    tag = "v${version}";
-    hash = "sha256-P063G4YD4IlNP0ezYGhELjK4AKFQ4wPXFhgYb9OjRf0=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-97Hgsu0ipX5oSAZdCikaWhj6g3gEom/Is2wnm6vpblY=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace-fail 'version = "0.0.0"' 'version = "${version}"'
+      --replace-fail 'version = "0.0.0"' 'version = "${finalAttrs.version}"'
   '';
 
   build-system = [ hatchling ];
@@ -42,9 +41,8 @@ buildPythonPackage rec {
   dependencies = [
     aiohttp
     backoff
-    mashumaro
-    orjson
     packaging
+    pydantic
     yarl
   ];
 
@@ -55,6 +53,7 @@ buildPythonPackage rec {
     pytest-mock
     pytest-xdist
     pytestCheckHook
+    zeroconf
   ];
 
   __darwinAllowLocalNetworking = true;
@@ -64,8 +63,8 @@ buildPythonPackage rec {
   meta = {
     description = "Module to control and monitor an BSBLan device programmatically";
     homepage = "https://github.com/liudger/python-bsblan";
-    changelog = "https://github.com/liudger/python-bsblan/releases/tag/${src.tag}";
+    changelog = "https://github.com/liudger/python-bsblan/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ fab ];
   };
-}
+})

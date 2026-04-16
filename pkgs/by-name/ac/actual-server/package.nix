@@ -13,13 +13,13 @@
 let
   nodejs = nodejs_22;
   yarn-berry = yarn-berry_4.override { inherit nodejs; };
-  version = "26.1.0";
+  version = "26.4.0";
   src = fetchFromGitHub {
     name = "actualbudget-actual-source";
     owner = "actualbudget";
     repo = "actual";
     tag = "v${version}";
-    hash = "sha256-WjWmiosDgEj3vTsOIKysR5HrNzkApQppUsdSil4Umbo=";
+    hash = "sha256-Gc2klYxGv+vd1Yc2ftj25B4Kea0GKkpjYcVDN9HvLPk=";
   };
   translations = fetchFromGitHub {
     name = "actualbudget-translations-source";
@@ -27,8 +27,8 @@ let
     repo = "translations";
     # Note to updaters: this repo is not tagged, so just update this to the Git
     # tip at the time the update is performed.
-    rev = "813c3d7cc8feb667c0ea3c25ba13156d75475cfe";
-    hash = "sha256-Qv9FFQCZv6WxYffP1W8Hdw15NDiGhkTeAUbyrOV5wxw=";
+    rev = "14c3f5e7ed4e47dedab8cebeaf5e2170cfa5f9d0";
+    hash = "sha256-+4hENE9unsta1YoIDE7shcjy1AlWfnPczvm4jYnw5Dw=";
   };
 
 in
@@ -95,7 +95,7 @@ stdenv.mkDerivation (finalAttrs: {
   missingHashes = ./missing-hashes.json;
   offlineCache = yarn-berry.fetchYarnBerryDeps {
     inherit (finalAttrs) src missingHashes;
-    hash = "sha256-7CxsRmuA53JZJa8IznJKGVvHzE7CeM7XklIZznRqXis=";
+    hash = "sha256-WWnf7HgTdyWrrHZA43hPjv8Q1PO1ETMKkd0eSu0pQ3M=";
   };
 
   pname = "actual-server";
@@ -139,8 +139,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://actualbudget.org/";
     mainProgram = "actual-server";
     license = lib.licenses.mit;
-    # https://github.com/NixOS/nixpkgs/issues/403846
-    broken = stdenv.hostPlatform.isDarwin;
     maintainers = [
       lib.maintainers.oddlama
       lib.maintainers.patrickdag

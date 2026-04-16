@@ -8,26 +8,26 @@
   stdenv,
 }:
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "myks";
-  version = "5.5.1";
+  version = "5.12.2";
 
   src = fetchFromGitHub {
     owner = "mykso";
     repo = "myks";
-    tag = "v${version}";
-    hash = "sha256-6K/mlx1l8Ijmligefb2Wcwq9aSGh5PbvgoyJpx0U4w4=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-CQCxsuZhqRo5PMahc1UBy5T2SvwDs50JWHmhm4qU3FI=";
   };
 
-  vendorHash = "sha256-Tl8ubucPn72TGD5ER3zeDHJUoSklNeeByitj/WfICoU=";
+  vendorHash = "sha256-BFuJBaOGzttc8Q1ZxMIx0SWnBWmHg7TwU5VG8Wgydb0=";
 
   subPackages = ".";
 
   ldflags = [
     "-s"
     "-w"
-    "-X=main.version=${version}"
-    "-X=main.commit=nixpkg-${version}"
+    "-X=main.version=${finalAttrs.version}"
+    "-X=main.commit=nixpkg-${finalAttrs.version}"
     "-X=main.date=1970-01-01"
   ];
 
@@ -45,7 +45,7 @@ buildGoModule rec {
   '';
 
   meta = {
-    changelog = "https://github.com/mykso/myks/blob/v${version}/CHANGELOG.md";
+    changelog = "https://github.com/mykso/myks/blob/v${finalAttrs.version}/CHANGELOG.md";
     description = "Configuration framework for Kubernetes applications";
     license = lib.licenses.mit;
     homepage = "https://github.com/mykso/myks";
@@ -55,4 +55,4 @@ buildGoModule rec {
     ];
     mainProgram = "myks";
   };
-}
+})

@@ -42,10 +42,10 @@ class DiscourseVersion:
         """Take either a tag or version number, calculate the other."""
         if version.startswith('v'):
             self.tag = version
-            self.version = version.lstrip('v')
+            self.version = version.lstrip('v').rstrip("-latest")
         else:
             self.tag = 'v' + version
-            self.version = version
+            self.version = version.rstrip("-latest")
 
         self._version = Version(self.version)
 
@@ -236,11 +236,6 @@ def update(rev):
         with open(rubyenv_dir / fn, 'w') as f:
             f.write(repo.get_file(fn, version.tag))
 
-    # Workaround for https://github.com/NixOS/nixpkgs/pull/469624
-    # Can be removed when openssl gem is already new enough, i.e. with discourse 2025.11.1
-    with open(rubyenv_dir / "Gemfile", "a") as f:
-        f.write('gem "openssl", "~> 3.3.1"')
-
     # work around https://github.com/nix-community/bundix/issues/8
     os.environ["BUNDLE_FORCE_RUBY_PLATFORM"] = "true"
     subprocess.check_output(['bundle', 'lock'], cwd=rubyenv_dir)
@@ -252,7 +247,7 @@ def update(rev):
     old_pnpm_hash = _nix_eval('discourse.assets.pnpmDeps.outputHash')
     new_pnpm_hash = _get_build_lock_hash()
     if new_pnpm_hash is not None:
-        click.echo(f"Updating yarn lock hash: {old_pnpm_hash} -> {new_pnpm_hash}")
+        click.echo(f"Updating pnpm lock hash: {old_pnpm_hash} -> {new_pnpm_hash}")
 
         with open(Path(__file__).parent / "default.nix", 'r+') as f:
             content = f.read()
@@ -287,6 +282,7 @@ def update_plugins():
     plugins = [
         {'name': 'discourse-bbcode-color'},
         {'name': 'discourse-docs'},
+        {'name': 'discourse-events', 'owner': 'angusmcleod'},
         {'name': 'discourse-ldap-auth', 'owner': 'jonmbake'},
         {'name': 'discourse-prometheus'},
         {'name': 'discourse-saved-searches'},
@@ -407,7 +403,7 @@ def update_plugins():
         plugin_file = plugin_file.replace(",\n", ", ") # fix split lines
         for line in plugin_file.splitlines():
             if 'gem ' in line:
-                line = ','.join(filter(lambda x: ":require_name" not in x, line.split(',')))
+                line = ','.join(filter(lambda x: ":require_name" not in x and "require_name:" not in x, line.split(',')))
                 gemfile_text = gemfile_text + line + os.linesep
 
                 version_file_match = version_file_regex.match(line)

@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   pkgs,
   buildPythonPackage,
   fetchFromGitHub,
@@ -46,24 +47,23 @@
   writableTmpDirAsHomeHook,
   yaspin,
 }:
-buildPythonPackage rec {
+buildPythonPackage (finalAttrs: {
   pname = "executorch";
-  version = "1.0.1";
+  version = "1.2.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "pytorch";
     repo = "executorch";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
 
     # The ExecuTorch repo must be cloned into a directory named exactly `executorch`.
     # See https://github.com/pytorch/executorch/issues/6475 for progress on a fix for this restriction.
     name = "executorch";
 
     fetchSubmodules = true;
-    hash = "sha256-h+nmipFDO/cdPTQXrjM5EkH//wHKBAvlDIp6SBbGN/8=";
+    hash = "sha256-Rkw6+keOygQaf6iOCpGoW9JgXiCimgx8gsxLEH3bxME=";
   };
-  # src = /home/gaetan/nix/nixpkgs-packages/executorch;
 
   postPatch =
     # Hardcode the default flatc binary path to the nixpkgs flatc
@@ -77,7 +77,7 @@ buildPythonPackage rec {
     + ''
       substituteInPlace pyproject.toml \
         --replace-fail '"pip>=23",' "" \
-        --replace-fail "cmake>=3.29,<4.0.0" "cmake"
+        --replace-fail "cmake>=3.24,<4.0.0" "cmake"
     ''
     # CMake 4 dropped support of versions lower than 3.5, versions lower than 3.10 are deprecated.
     # https://github.com/NixOS/nixpkgs/issues/445447
@@ -86,10 +86,28 @@ buildPythonPackage rec {
         --replace-fail \
           "CMAKE_MINIMUM_REQUIRED(VERSION 3.5 FATAL_ERROR)" \
           "CMAKE_MINIMUM_REQUIRED(VERSION 3.10 FATAL_ERROR)"
+    ''
+    # Fix build with GCC>=15
+    + ''
+      substituteInPlace third-party/flatcc/include/flatcc/portable/grisu3_print.h \
+        --replace-fail \
+          'static char hexdigits[16] = "0123456789ABCDEF";' \
+          'static char hexdigits[17] = "0123456789ABCDEF";'
+
+      sed -i "1i #include <cstdint>" backends/apple/coreml/runtime/inmemoryfs/memory_buffer.hpp
+      sed -i "1i #include <cstdint>" extension/llm/tokenizers/third-party/sentencepiece/src/sentencepiece_processor.h
     '';
 
   env = {
-    BUILD_VERSION = version;
+    BUILD_VERSION = finalAttrs.version;
+
+    # Can't use cmakeFlags since we do not control invocation of cmake.
+    # But the build script is sensitive to this env variable.
+    # Fixes:
+    #  Some binaries contain forbidden references to /build/. Check the error above!
+    CMAKE_ARGS = lib.concatStringsSep " " [
+      (lib.cmakeBool "CMAKE_SKIP_BUILD_RPATH" true)
+    ];
   };
 
   build-system = [
@@ -117,6 +135,7 @@ buildPythonPackage rec {
     "pytest-xdist"
   ];
   pythonRelaxDeps = [
+    "scikit-learn"
     "torchao"
   ];
   dependencies = [
@@ -176,6 +195,7 @@ buildPythonPackage rec {
     # AssertionError (Numerical comparison fails)
     "test_sdpa_with_cache_seq_len_13"
     "test_sdpa_with_custom_quantized_seq_len_130_gqa"
+    "test_within_transformer"
 
     # Try to download models from the internet
     "test_all_models_with_recipes"
@@ -189,12 +209,24 @@ buildPythonPackage rec {
     "test_resnet18_export_to_executorch"
     "test_resnet50_export_to_executorch"
     "test_vit_export_to_executorch"
+
+    # RuntimeError: Failed to compile /build/tmplb6i266d/data.json to /build/tmplb6i266d/data.pte
+    "test_flatbuffer_paths_match"
+  ]
+  ++ lib.optionals (stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isx86_64) [
+    # RuntimeError: Error in dlopen:
+    # /tmp/AP8CBk/vision_encoder/data/aotinductor/model/chm6ca425mbz7jdmmwcbnyrm6x6tedrfmaoyr4vee625vxhjibbt.wrapper.so:
+    # cannot enable executable stack as shared object requires: Invalid argument
+    "TestImageTransform"
+    "test_flamingo_vision_encoder"
+    "test_llama3_2_text_decoder_aoti"
+    "test_tile_positional_embedding_aoti"
   ];
 
   meta = {
     description = "On-device AI across mobile, embedded and edge for PyTorch";
     homepage = "https://github.com/pytorch/executorch";
-    changelog = "https://github.com/pytorch/executorch/releases/tag/v${version}";
+    changelog = "https://github.com/pytorch/executorch/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.bsd3;
     maintainers = with lib.maintainers; [ GaetanLepage ];
     badPlatforms = [
@@ -204,4 +236,4 @@ buildPythonPackage rec {
       lib.systems.inspect.patterns.isDarwin
     ];
   };
-}
+})

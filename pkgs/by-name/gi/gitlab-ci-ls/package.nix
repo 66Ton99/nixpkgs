@@ -6,17 +6,17 @@
   pkg-config,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "gitlab-ci-ls";
-  version = "1.2.5";
+  version = "1.3.1";
   src = fetchFromGitHub {
     owner = "alesbrelih";
     repo = "gitlab-ci-ls";
-    rev = "${version}";
-    hash = "sha256-Ly4pk+16RCr3r33VrYPTZGUXfUNd5IJHfA+uj7Ef3bk=";
+    rev = "${finalAttrs.version}";
+    hash = "sha256-ZZjx6VdBZuVuHl42n0iXZkvvUku2CN7x4JCZxZTMOMk=";
   };
 
-  cargoHash = "sha256-/w5inDL6ECs2Ce8Bdfr4sOKhGeFC0tE5SrW3aIXjHnA=";
+  cargoHash = "sha256-OB44JaekEl1dJB6LGTLWXgcwYac2GA3I9Ab8xt/+rkI=";
 
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [ openssl ];
@@ -29,4 +29,4 @@ rustPlatform.buildRustPackage rec {
     platforms = lib.platforms.unix;
     mainProgram = "gitlab-ci-ls";
   };
-}
+})

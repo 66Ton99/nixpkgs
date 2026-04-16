@@ -8,20 +8,20 @@
   zlib,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "ffizer";
-  version = "2.13.6";
+  version = "2.13.9";
 
   buildFeatures = [ "cli" ];
 
   src = fetchFromGitHub {
     owner = "ffizer";
     repo = "ffizer";
-    rev = version;
-    hash = "sha256-1UKXUcoAFQymz1J4oLH8Bwqxby8d+fhcFFYbfQBwTeo=";
+    rev = finalAttrs.version;
+    hash = "sha256-7nTtyCtppUZ3vEtiDfDMCvDztZRVDFH43bl5fgZtfFM=";
   };
 
-  cargoHash = "sha256-+0d2cnRso6M4qhtdb3fk4AZ7vsDl49Ycly98xybaZRg=";
+  cargoHash = "sha256-/BdODBhF+ikre/U1TzB+/DqSs7LYn7NhPKgMJT80TUM=";
 
   nativeBuildInputs = [
     pkg-config
@@ -43,9 +43,9 @@ rustPlatform.buildRustPackage rec {
   meta = {
     description = "Files and folders initializer / generator based on templates";
     homepage = "https://github.com/ffizer/ffizer";
-    changelog = "https://github.com/ffizer/ffizer/blob/${src.rev}/CHANGELOG.md";
+    changelog = "https://github.com/ffizer/ffizer/blob/${finalAttrs.src.rev}/CHANGELOG.md";
     license = lib.licenses.cc0;
     maintainers = with lib.maintainers; [ XBagon ];
     mainProgram = "ffizer";
   };
-}
+})

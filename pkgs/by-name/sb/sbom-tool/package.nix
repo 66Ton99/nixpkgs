@@ -9,13 +9,13 @@
 
 buildDotnetModule rec {
   pname = "sbom-tool";
-  version = "4.1.5";
+  version = "4.1.9";
 
   src = fetchFromGitHub {
     owner = "microsoft";
     repo = "sbom-tool";
     tag = "v${version}";
-    hash = "sha256-MIsCgUBHhaHobKfq3O/hL7+bXZVHgvtig7h4JIN8Gws=";
+    hash = "sha256-Jm/gWHlEr+Sowh657jLAp50uvR60dMbONJQSKEDe9Ow=";
   };
 
   projectFile = "src/Microsoft.Sbom.Tool/Microsoft.Sbom.Tool.csproj";
@@ -26,6 +26,8 @@ buildDotnetModule rec {
 
   dotnetBuildFlags = [
     "-p:MinVerVersionOverride=${version}"
+    # this is fragile with sdk updates
+    "-p:EnforceCodeStyleInBuild=false"
   ];
 
   dotnetInstallFlags = [
