@@ -31,13 +31,13 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "modrinth-app-unwrapped";
-  version = "0.12.6";
+  version = "0.13.6";
 
   src = fetchFromGitHub {
     owner = "modrinth";
     repo = "code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-qVFDCn+8dtiIULNIq37wIrqaUNvNIoXoHl8QhUTyz48=";
+    hash = "sha256-47uokwYsEg5D0lyHdpqfvKlsuXZK0sm5YIWwNjVGsKQ=";
   };
 
   patches = [
@@ -67,7 +67,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --replace-fail '1.0.0-local' '${finalAttrs.version}'
   '';
 
-  cargoHash = "sha256-PDsq5XEU+ZfyGzwtwxQ3i2TURjhies/Up3SVysOprZ0=";
+  cargoHash = "sha256-Mnb16KO+xcocUuvQN4woUlb1aFNzzwyIeRP4mIcA1Fk=";
   mitmCache = gradle.fetchDeps {
     inherit (finalAttrs) pname;
     data = ./deps.json;
@@ -77,7 +77,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     inherit (finalAttrs) pname version src;
     pnpm = pnpm_9;
     fetcherVersion = 3;
-    hash = "sha256-JD+mzSHMVLGnkc5Jrxy+mtZ8W82E0pQhglsC3NmfszQ=";
+    hash = "sha256-Hk32LBD20F2LRgqNs8f1j3VdUxKoTPWs3yJvOghsEbI=";
   };
 
   nativeBuildInputs = [
